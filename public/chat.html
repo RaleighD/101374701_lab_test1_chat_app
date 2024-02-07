@@ -7,24 +7,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1 id="room-name">Chat Room</h1>
-<div id="chat-messages" style="border: 1px solid #000; height: 300px; overflow-y: scroll;">
-    <!-- Messages will be displayed here -->
+<div class="chat-container">
+    <div class="header" id="room-name">Chat Room</div>
+    <div id="chat-messages"></div>
+    <div id="typingIndicator" style="display: none;"></div>
+    <div class="input-area">
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
+    </div>
+    <div class="footer">
+        <button id="back-to-chatlist">Back to Chat List</button>
+        <button id="logoutButton">Logout</button>
+    </div>
 </div>
-<input type="text" id="chat-input" placeholder="Type a message...">
-<button id="send-btn">Send</button>
-
+<script src="/socket.io/socket.io.js"></script>
+<script src="chat.js"></script> <!-- Ensure chat.js is correctly handling socket connections and events -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('back-to-chatlist').addEventListener('click', function() {
-            window.location.href = 'chatlist.html';
+        const backToChatlistButton = document.getElementById('back-to-chatlist');
+        if (backToChatlistButton) {
+            backToChatlistButton.addEventListener('click', function() {
+                window.location.href = 'chatlist.html';
+            });
+        }
+
+        const logoutButton = document.getElementById('logoutButton');
+        logoutButton.addEventListener('click', function() {
+            localStorage.removeItem('username');
+            window.location.href = 'index.html';
         });
     });
 </script>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="chat.js"></script> <!-- Your custom JS for handling chat -->
-
-<button id="back-to-chatlist">Back to Chat List</button>
 </body>
 </html>

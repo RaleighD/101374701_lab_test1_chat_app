@@ -45,10 +45,13 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({ username });
         if (!user) {
             console.log('User not found');
-
-            // Add password check
             return res.status(400).json({ error: 'User not found' });
         }
+
+        if (password !== user.password) {
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
+
         // Assuming password check passes, redirect or send a successful login response
         // For redirecting after successful login, ensure no response has been sent before
         console.log('User found');
@@ -69,18 +72,35 @@ app.get('/chat', (req, res) => {
 //Chat Routing and logic
 io.on('connection', (socket) => {
     console.log('A user connected');
-    socket.on('join room', (room) => {
+
+    socket.on('join room', async (joinedRoom) => { // Mark the function as async
+        const room = joinedRoom;
         socket.join(room);
         console.log(`User joined room: ${room}`);
+
+        try {
+            // Use async/await instead of a callback
+            const messages = await Message.find({ room: room })
+                .sort({ createdAt: 1 })
+                .limit(50)
+                .exec(); // No callback passed here
+
+            socket.emit('chat history', messages);
+        } catch (err) {
+            console.error('Error retrieving messages from database', err);
+        }
     });
 
-    // Listen for 'chat message' events and broadcast them to the room
-    socket.on('join room', (room) => {
-        socket.join(room);
-        console.log(`User joined room: ${room}`);
+    socket.on('typing', (data) => {
+        socket.to(data.room).emit('user typing', data.username);
     });
 
-    // Updated to use async/await for saving messages
+    socket.on('stop typing', (data) => {
+        socket.to(data.room).emit('user stop typing', data.username);
+    });
+
+
+    // SAVINg messages to mongo
     socket.on('chat message', async (data) => {
         // Create a new message instance using the model
         const message = new Message({
