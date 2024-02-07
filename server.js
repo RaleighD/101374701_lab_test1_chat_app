@@ -21,6 +21,10 @@ mongoose.connect('mongodb+srv://admin:admin@cluster0.ocx31n5.mongodb.net/?retryW
 app.use(express.static('public'));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.sendFile(pathj.join(__dirname + '/public/index.html'));
+});
+
 // Signup Route
 app.post('/signup', async (req, res) => {
     try {
