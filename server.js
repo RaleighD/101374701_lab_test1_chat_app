@@ -17,7 +17,7 @@ mongoose.connect('mongodb+srv://admin:admin@cluster0.ocx31n5.mongodb.net/?retryW
     .catch(err => console.error(err));
 
 app.use(express.static('public'));
-app.use(express.json()); // For parsing application/json
+app.use(express.json());
 
 // Signup Route
 app.post('/signup', async (req, res) => {
@@ -25,10 +25,10 @@ app.post('/signup', async (req, res) => {
         const { username, firstname, lastname, password } = req.body;
         const user = new User({ username, firstname, lastname, password });
         await user.save();
-        res.status(201).json({ message: 'User created successfully' });
+        return res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
-        // Updated to return JSON
-        res.status(400).json({ error: error.message });
+        // Ensure to return after sending response to avoid "headers already sent" error
+        return res.status(400).json({ error: error.message });
     }
 });
 
@@ -43,21 +43,25 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({ username });
         if (!user) {
             console.log('User not found');
+
+            // Add password check
             return res.status(400).json({ error: 'User not found' });
         }
+        // Assuming password check passes, redirect or send a successful login response
+        // For redirecting after successful login, ensure no response has been sent before
         console.log('User found');
-        // Assuming password check is omitted, update for JSON response
-        res.status(200).json({ message: 'Login successful' });
+        // Redirect or respond here but not both
+        // res.redirect('/chatlist.html'); // Use for redirecting without additional response
+        return res.status(200).json({ message: 'Login successful' }); // Choose appropriate response
     } catch (error) {
-        // Updated to return JSON
-        res.status(500).json({ error: error.message });
+        // Ensure to return after sending response to avoid "headers already sent" error
+        return res.status(500).json({ error: error.message });
     }
 });
 
 //Chat Routing
 io.on('connection', (socket) => {
     console.log('A user connected');
-
 
     //Joining room,
     socket.on('join room', (room) => {
