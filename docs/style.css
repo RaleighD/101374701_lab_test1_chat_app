@@ -19,7 +19,7 @@ body, html {
 
 /* Chat Container */
 .chat-container {
-    width: 600 px;
+    width: 600px;
     height: auto;
     background: #FFFFFF;
     border-radius: 18px;
@@ -49,7 +49,7 @@ body, html {
 
 /* Single Message */
 #chat-messages div {
-    background-color: #f0Okay nf0f0;
+    background-color: #f0f0f0;
     padding: 8px 12px;
     border-radius: 18px;
     margin-bottom: 8px;
