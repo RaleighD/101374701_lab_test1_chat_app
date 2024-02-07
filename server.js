@@ -8,6 +8,8 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const User = require('./models/user');
+const Message = require('./models/message'); // Adjust the path as necessary
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -52,29 +54,76 @@ app.post('/login', async (req, res) => {
         console.log('User found');
         // Redirect or respond here but not both
         // res.redirect('/chatlist.html'); // Use for redirecting without additional response
-        return res.status(200).json({ message: 'Login successful' }); // Choose appropriate response
+        return res.status(200).json({ user: username, message: 'Login successful', }); // Choose appropriate response
     } catch (error) {
         // Ensure to return after sending response to avoid "headers already sent" error
         return res.status(500).json({ error: error.message });
     }
 });
 
-//Chat Routing
+// Chatroom select routing
+app.get('/chat', (req, res) => {
+    res.sendFile(__dirname + '/public/chat.html');
+});
+
+//Chat Routing and logic
 io.on('connection', (socket) => {
     console.log('A user connected');
-
-    //Joining room,
     socket.on('join room', (room) => {
         socket.join(room);
         console.log(`User joined room: ${room}`);
     });
-    //Sending messages only to users in specific room
-    socket.on('chat message', (msg, room) => {
-        io.to(room).emit('chat message', msg);
+
+    // Listen for 'chat message' events and broadcast them to the room
+    socket.on('join room', (room) => {
+        socket.join(room);
+        console.log(`User joined room: ${room}`);
+    });
+
+    // Updated to use async/await for saving messages
+    socket.on('chat message', async (data) => {
+        // Create a new message instance using the model
+        const message = new Message({
+            room: data.room,
+            username: data.username,
+            message: data.msg
+        });
+
+        try {
+            // Save the message to MongoDB using async/await
+            await message.save();
+            // After saving, broadcast the message to the room
+            io.to(data.room).emit('chat message', data);
+        } catch (err) {
+            console.error('Error saving message to database', err);
+        }
     });
 
     socket.on('disconnect', () => {
         console.log('User disconnected');
+    });
+});
+
+
+
+// Additional message saving stuff
+
+io.on('chat message', (data) => {
+    const message = new Message({
+        room: data.room,
+        username: data.username,
+        message: data.msg
+    });
+
+    // Save the message to MongoDB
+    message.save(err => {
+        if (err) {
+            console.error('Error saving message to database', err);
+            return;
+        }
+
+        // After saving, broadcast the message to the room
+        io.to(data.room).emit('chat message', data);
     });
 });
 
