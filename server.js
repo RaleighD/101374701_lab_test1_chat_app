@@ -21,8 +21,6 @@ mongoose.connect('mongodb+srv://admin:admin@cluster0.ocx31n5.mongodb.net/?retryW
 app.use(express.static('public'));
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Signup Route
 app.post('/signup', async (req, res) => {
     try {
@@ -37,7 +35,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
-    res.sendFile(__dirname + '/docs/signup.html');
+    res.sendFile(__dirname + '/public/signup.html');
 });
 
 // Login Route
@@ -68,7 +66,7 @@ app.post('/login', async (req, res) => {
 
 // Chatroom select routing
 app.get('/chat', (req, res) => {
-    res.sendFile(__dirname + '/docs/chat.html');
+    res.sendFile(__dirname + '/public/chat.html');
 });
 
 //Chat Routing and logic

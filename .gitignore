@@ -49,8 +49,8 @@ dist
 
 # Gatsby files
 .cache/
-# Comment in the docs line in if your project uses Gatsby and *not* the line above
-# docs/
+# Comment in the public line in if your project uses Gatsby and *not* the line above
+# public/
 
 # vuepress build output
 .vuepress/dist
