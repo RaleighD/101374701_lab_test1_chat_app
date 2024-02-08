@@ -15,9 +15,9 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     })
         .then(response => {
             if (response.ok) {
-                return response.json(); // If login is successful
+                return response.json();
             } else if (response.status === 401) {
-                // Handle 401 Unauthorized specifically
+                // Handle 401
                 return response.json().then(data => {
                     throw new Error(data.message || 'Incorrect password');
                 });
@@ -29,10 +29,10 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
         .then(data => {
             console.log('Login successful:', data);
             localStorage.setItem('username', formData.username);
-            window.location.href = '/chatlist.html'; // Redirect to chat list page
+            window.location.href = '/chatlist.html';
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message); // Display the error message from the server
+            alert(error.message);
         });
 });

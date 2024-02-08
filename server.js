@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const User = require('./models/user');
-const Message = require('./models/message'); // Adjust the path as necessary
+const Message = require('./models/message');
 
 
 const PORT = process.env.PORT || 3000;
@@ -29,7 +29,7 @@ app.post('/signup', async (req, res) => {
         await user.save();
         return res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
-        // Ensure to return after sending response to avoid "headers already sent" error
+
         return res.status(400).json({ error: error.message });
     }
 });
@@ -52,14 +52,10 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Incorrect password' });
         }
 
-        // Assuming password check passes, redirect or send a successful login response
-        // For redirecting after successful login, ensure no response has been sent before
         console.log('User found');
-        // Redirect or respond here but not both
-        // res.redirect('/chatlist.html'); // Use for redirecting without additional response
-        return res.status(200).json({ user: username, message: 'Login successful', }); // Choose appropriate response
+
+        return res.status(200).json({ user: username, message: 'Login successful', });
     } catch (error) {
-        // Ensure to return after sending response to avoid "headers already sent" error
         return res.status(500).json({ error: error.message });
     }
 });
@@ -73,17 +69,17 @@ app.get('/chat', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    socket.on('join room', async (joinedRoom) => { // Mark the function as async
+    socket.on('join room', async (joinedRoom) => {
         const room = joinedRoom;
         socket.join(room);
         console.log(`User joined room: ${room}`);
 
         try {
-            // Use async/await instead of a callback
+
             const messages = await Message.find({ room: room })
                 .sort({ createdAt: 1 })
                 .limit(50)
-                .exec(); // No callback passed here
+                .exec();
 
             socket.emit('chat history', messages);
         } catch (err) {
@@ -102,7 +98,6 @@ io.on('connection', (socket) => {
 
     // SAVINg messages to mongo
     socket.on('chat message', async (data) => {
-        // Create a new message instance using the model
         const message = new Message({
             room: data.room,
             username: data.username,
@@ -142,7 +137,7 @@ io.on('chat message', (data) => {
             return;
         }
 
-        // After saving, broadcast the message to the room
+        // After saving, broadcast to room
         io.to(data.room).emit('chat message', data);
     });
 });

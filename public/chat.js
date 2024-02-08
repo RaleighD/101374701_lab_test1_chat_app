@@ -1,13 +1,13 @@
-const socket = io(); // Connect to the server
+const socket = io();
 
-// Attempt to retrieve the username from local storage
+//Get username from local storage
 const username = localStorage.getItem('username') || 'Anonymous';
 
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-btn');
 const chatMessages = document.getElementById('chat-messages');
 const urlParams = new URLSearchParams(window.location.search);
-const roomName = urlParams.get('room'); // Extract the 'room' query parameter
+const roomName = urlParams.get('room');
 const messageData = {msg: chatInput.value.trim(), room: roomName, username: username}
 const typingIndicator = document.getElementById('typingIndicator');
 
@@ -30,14 +30,14 @@ chatInput.addEventListener('keypress', () => {
 sendButton.addEventListener('click', function() {
     const message = chatInput.value.trim();
     if (message) {
-        console.log(`Sending message: "${message}" as ${username} in ${roomName}`); // Debugging line
+        console.log(`Sending message: "${message}" as ${username} in ${roomName}`);
         socket.emit('chat message', { msg: message, room: roomName, username: username });
         chatInput.value = '';
     }
 });
 
 socket.on('chat message', function(data) {
-    console.log(`Received message: "${data.msg}" from ${data.username}`); // Debugging line
+    console.log(`Received message: "${data.msg}" from ${data.username}`);
     const messageElement = document.createElement('div');
     messageElement.innerText = `${data.username}: ${data.msg}`;
     chatMessages.appendChild(messageElement);
@@ -45,13 +45,13 @@ socket.on('chat message', function(data) {
 });
 
 socket.on('chat history', function(messages) {
-    // Clear existing messages first to avoid duplicates
+    // Clear existing messages
     chatMessages.innerHTML = '';
 
-    // Iterate through each message in the history and append it
+    // Iterate through each message in the history and append it to main chat window
     messages.forEach(function(message) {
         const messageElement = document.createElement('div');
-        messageElement.innerText = `${message.username}: ${message.message}`; // Adjust according to how messages are structured
+        messageElement.innerText = `${message.username}: ${message.message}`;
         chatMessages.appendChild(messageElement);
     });
 

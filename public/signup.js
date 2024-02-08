@@ -1,7 +1,7 @@
 document.getElementById('signupForm').addEventListener('submit', function(e) {
     e.preventDefault(); // Prevent default form submission
 
-    // Collect form data
+    // form data
     const formData = {
         username: this.username.value,
         firstname: this.firstname.value,
@@ -9,7 +9,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
         password: this.password.value,
     };
 
-    // Send data to server via fetch or XMLHttpRequest
+    // Send data to server
     fetch('/signup', {
         method: 'POST',
         headers: {
@@ -20,8 +20,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            // Redirect to login page or show success message
-            window.location.href = 'index.html'; // Redirect to login page
+            window.location.href = 'index.html';
         })
         .catch((error) => {
             console.error('Error:', error);
